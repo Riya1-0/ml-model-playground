@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ML Model Playground</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<h2>ML Model Playground</h2>
+
+<form action="/train" method="POST" enctype="multipart/form-data">
+
+    <label>Upload CSV File:</label><br>
+    <input type="file" name="csv_file" required><br><br>
+
+    <label>Select Target Column:</label><br>
+    <select name="target">
+        <option value="target_column">target_column</option>
+    </select><br><br>
+
+    <label>Problem Type:</label><br>
+    <select name="problem_type">
+        <option value="classification">Classification</option>
+        <option value="regression">Regression</option>
+    </select><br><br>
+
+    <button type="submit">Train Models</button>
+
+</form>
+
+</body>
+</html>
