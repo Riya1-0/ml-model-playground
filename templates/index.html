@@ -2,20 +2,32 @@
 <html>
 <head>
     <title>ML Model Playground</title>
-    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 
 <h2>ML Model Playground</h2>
 
+<!-- FORM 1: Upload CSV (only when columns NOT loaded) -->
+{% if not columns %}
 <form action="/train" method="POST" enctype="multipart/form-data">
-
     <label>Upload CSV File:</label><br>
     <input type="file" name="csv_file" required><br><br>
+    <button type="submit">Upload CSV</button>
+</form>
+{% endif %}
 
+<!-- Message after upload -->
+{% if columns %}
+<p><strong>CSV uploaded successfully. Select target column:</strong></p>
+<hr>
+
+<!-- FORM 2: Target selection -->
+<form action="/train" method="POST">
     <label>Select Target Column:</label><br>
-    <select name="target">
-        <option value="target_column">target_column</option>
+    <select name="target" required>
+        {% for col in columns %}
+            <option value="{{ col }}">{{ col }}</option>
+        {% endfor %}
     </select><br><br>
 
     <label>Problem Type:</label><br>
@@ -25,8 +37,8 @@
     </select><br><br>
 
     <button type="submit">Train Models</button>
-
 </form>
+{% endif %}
 
 </body>
 </html>
