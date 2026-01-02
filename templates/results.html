@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
 <head>
     <title>Results</title>
@@ -12,6 +12,36 @@
 <p><b>Problem Type:</b> {{ problem_type }}</p>
 
 <p>✅ Website is working!</p>
+
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Model Results</title>
+</head>
+<body>
+
+<h2>Model Performance</h2>
+
+<table border="1">
+    <tr>
+        <th>Model Name</th>
+        <th>Score</th>
+    </tr>
+
+    {% for row in results %}
+    <tr>
+        <td>{{ row.model }}</td>
+        <td>{{ row.score }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<br>
+<a href="/">Go Back</a>
 
 </body>
 </html>
