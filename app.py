@@ -1,11 +1,14 @@
 from flask import Flask, render_template, request
 import pandas as pd
 from sklearn.model_selection import train_test_split
+from sklearn.impute import SimpleImputer
+import numpy as np
 
 # Classification models
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import LabelEncoder
 
 # Regression models
 from sklearn.linear_model import LinearRegression
@@ -40,6 +43,9 @@ def train():
             'index.html',
             columns=columns
         )
+    
+    
+
 
     # =========================
     # CASE 2: MODEL TRAINING
@@ -47,6 +53,7 @@ def train():
     target = request.form.get('target')
     problem_type = request.form.get('problem_type')
 
+    
     if df_global is None:
         return "Error: No CSV uploaded"
 
@@ -55,8 +62,38 @@ def train():
 
     df = df_global   # ✅ USE STORED DATAFRAME
 
+    # X = df.drop(columns=[target])
+    # for col in X.columns:
+    #     if X[col].dtype == 'object':
+    #         le = LabelEncoder()
+    #         X[col] = le.fit_transform(X[col])
+
+    # imputer = SimpleImputer(strategy="mean")
+    # X = imputer.fit_transform(X)
+
+    # Separate features
     X = df.drop(columns=[target])
+
+    # Encode categorical feature columns
+    for col in X.columns:
+        if X[col].dtype == "object":
+            le = LabelEncoder()
+            X[col] = le.fit_transform(X[col])
+
+    # Handle missing values (NaN)
+    imputer = SimpleImputer(strategy="mean")
+    X = imputer.fit_transform(X)
+
+
     y = df[target]
+    if problem_type == "classification":
+        le = LabelEncoder()
+        y = le.fit_transform(y)
+
+
+    if problem_type == "classification" and len(np.unique(y)) > 20:
+        return "Error: Selected target is continuous. Please choose Regression."
+
 
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42
