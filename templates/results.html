@@ -1,4 +1,9 @@
 
+
+<!-- @format -->
+
+
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,22 +14,49 @@
 
 <h2>Model Performance</h2>
 
+<p><strong>Problem Type:</strong> {{ problem_type }}</p>
+<h3>🏆 Best Model: {{ best_model.Model }}</h3>
+
 <table border="1">
     <tr>
-        <th>Model Name</th>
-        <th>Score</th>
+        {% for key in results[0].keys() %}
+            <th>{{ key }}</th>
+        {% endfor %}
     </tr>
 
     {% for row in results %}
     <tr>
-        <td>{{ row.model }}</td>
-        <td>{{ row.score }}</td>
+        {% for value in row.values() %}
+            <td>{{ value }}</td>
+        {% endfor %}
     </tr>
     {% endfor %}
 </table>
+
+<br>
+
+
+
+<div
+    id="chart"
+    style="width:600px;height:400px;"
+    data-models='{{ results | map(attribute="Model") | list | tojson }}'
+    data-scores='{{ chart_scores | tojson }}'>
+</div>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="{{ url_for('static', filename='chart.js') }}"></script>
+
+<!-- <script>
+    drawChart(
+        {{ results | map(attribute='Model') | list | tojson }},
+        {{ chart_scores | tojson }}
+    );
+</script> -->
 
 <br>
 <a href="/">Go Back</a>
 
 </body>
 </html>
+

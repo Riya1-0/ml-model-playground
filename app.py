@@ -2,7 +2,7 @@ from flask import Flask, render_template, request
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.impute import SimpleImputer
-import numpy as np
+
 
 # Classification models
 from sklearn.linear_model import LogisticRegression
@@ -16,7 +16,9 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
 
 # Metrics
-from sklearn.metrics import accuracy_score, r2_score
+from sklearn.metrics import accuracy_score, f1_score, mean_squared_error
+import numpy as np
+
 
 app = Flask(__name__)
 
@@ -29,7 +31,7 @@ def home():
 
 @app.route('/train', methods=['POST'])
 def train():
-    global df_global   # ✅ FIX 2
+    global df_global  
 
     # =========================
     # CASE 1: CSV UPLOAD
@@ -45,8 +47,6 @@ def train():
         )
     
     
-
-
     # =========================
     # CASE 2: MODEL TRAINING
     # =========================
@@ -62,16 +62,7 @@ def train():
 
     df = df_global   # ✅ USE STORED DATAFRAME
 
-    # X = df.drop(columns=[target])
-    # for col in X.columns:
-    #     if X[col].dtype == 'object':
-    #         le = LabelEncoder()
-    #         X[col] = le.fit_transform(X[col])
-
-    # imputer = SimpleImputer(strategy="mean")
-    # X = imputer.fit_transform(X)
-
-    # Separate features
+    
     X = df.drop(columns=[target])
 
     # Encode categorical feature columns
@@ -125,19 +116,40 @@ def train():
         predictions = model.predict(X_test)
 
         if problem_type == "classification":
-            score = accuracy_score(y_test, predictions)
+            acc = accuracy_score(y_test, predictions)
+            f1 = f1_score(y_test, predictions, average='weighted')
+
+            results.append({
+                "Model": name,
+                "Accuracy": round(acc, 4),
+                "F1": round(f1, 4)
+            })
+
         else:
-            score = r2_score(y_test, predictions)
+            rmse = np.sqrt(mean_squared_error(y_test, predictions))
 
-        results.append({
-            "model": name,
-            "score": round(score, 4)
-        })
+            results.append({
+                "Model": name,
+                "RMSE": round(rmse, 4)
+            })
 
+    if problem_type == "classification":
+        best_model = max(results, key=lambda x: x["Accuracy"])
+    else:
+        best_model = min(results, key=lambda x: x["RMSE"])
+
+    if problem_type == "classification":
+        chart_scores = [row["Accuracy"] for row in results]
+    else:
+        chart_scores = [row["RMSE"] for row in results]
+
+        
     return render_template(
         'results.html',
         results=results,
+        best_model=best_model,
         target=target,
+        chart_scores=chart_scores,
         problem_type=problem_type
     )
 
