@@ -17,6 +17,7 @@
 <p><strong>Problem Type:</strong> {{ problem_type }}</p>
 <h3>🏆 Best Model: {{ best_model.Model }}</h3>
 
+
 <table border="1">
     <tr>
         {% for key in results[0].keys() %}
@@ -35,6 +36,15 @@
 
 <br>
 
+
+<h3>🏆 Model Explanation</h3>
+<p>{{ explanation }}</p>
+
+{% if plot_path %}
+    <h3>📊 Feature Importance</h3>
+    <img src="{{ plot_path }}" width="500">
+{% endif %}
+<br><br>
 
 
 <div
